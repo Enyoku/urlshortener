@@ -22,8 +22,7 @@ func New(db *storage.DB) *API {
 }
 
 func (api *API) Endpoints() {
-
-	// api.router.HandleFunc("/", ).Methods(http.MethodPost)
+	api.router.Use(headerMiddleware)
 }
 
 func (api *API) Run(addr string) error {
