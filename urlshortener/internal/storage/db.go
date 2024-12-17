@@ -29,7 +29,7 @@ func AddUrl(ctx context.Context, db *DB, urls models.Urls) error {
 
 	defer tx.Rollback()
 
-	stmt, err := tx.Prepare(`INSERT INTO url(long_url, short_url) VALUES (?, ?) `)
+	stmt, err := tx.Prepare(`INSERT INTO url(long_url, short_url) VALUES (?, ?)`)
 	if err != nil {
 		return err
 	}
