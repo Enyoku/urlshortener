@@ -49,7 +49,7 @@ func AddUrl(ctx context.Context, db *DB, urls models.Urls) error {
 	return nil
 }
 
-func GetUrls(ctx context.Context, db *DB, url models.Url) ([]models.Urls, error) {
+func GetUrl(ctx context.Context, db *DB, url models.Url) ([]models.Url, error) {
 	rows, err := db.pool.QueryContext(ctx, `
 		SELECT long_url
 		FROM url
@@ -60,12 +60,11 @@ func GetUrls(ctx context.Context, db *DB, url models.Url) ([]models.Urls, error)
 	}
 	defer rows.Close()
 
-	var urls []models.Urls
+	var urls []models.Url
 	for rows.Next() {
-		var u models.Urls
+		var u models.Url
 		err := rows.Scan(
 			&u.Url,
-			&u.ShortUrl,
 		)
 		if err != nil {
 			return nil, err
