@@ -30,12 +30,14 @@ func (api *API) Endpoints() {
 	api.router.Use(headerMiddleware)
 
 	api.router.HandleFunc("/", api.addUrl).Methods(http.MethodPost)
+	api.router.HandleFunc("/{name}", api.redirect).Methods(http.MethodGet)
 }
 
 func (api *API) Run(addr string) error {
 	return http.ListenAndServe(addr, api.router)
 }
 
+// Adding url in db and response generated short url
 func (api *API) addUrl(w http.ResponseWriter, r *http.Request) {
 	var url models.Url
 
@@ -64,6 +66,25 @@ func (api *API) addUrl(w http.ResponseWriter, r *http.Request) {
 	w.Write(resp)
 }
 
+// Redirect to original url in db by short url
+func (api *API) redirect(w http.ResponseWriter, r *http.Request) {
+	url := models.Url{Url: "http://" + r.Host + r.URL.Path}
+
+	r_url, err := storage.GetUrl(r.Context(), api.db, url)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var res string
+	for _, u := range r_url {
+		res = u.Url
+	}
+
+	http.Redirect(w, r, res, http.StatusPermanentRedirect)
+}
+
+// Generate random string for shorter url
 func randString(n int) string {
 	b := make([]byte, n)
 	if _, err := rand.Read(b); err != nil {
